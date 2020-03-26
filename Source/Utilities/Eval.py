@@ -7,6 +7,8 @@ Utility functions for evaluating methods
 
 import numpy as np
 import matplotlib.pyplot as plt
+from gym import Env
+from Methods.Policies import Policy
 
 
 class StatsLogger:
@@ -73,12 +75,17 @@ class ScrollingPlot:
         fig, axes = plt.subplots(len(figures), 1)
         self.fig = fig
         self.figures = figures
-        self.axes = axes
+        if len(figures) == 1:
+            self.axes = [axes]
+        else:
+            self.axes = axes
         self.fig.show()
+        self.x_range = 2000
         self.plot_lines = {}
 
-    def update_plot(self, stats):
+    def update_plot(self):
         for figure, ax in zip(self.figures, self.axes):
+            stats = figure["source"]
             # min limits of y axis for all plots in this figure
             min_y = float("inf")
             max_y = float("-inf")
@@ -90,7 +97,7 @@ class ScrollingPlot:
             min_y = min_y - padding_y
             max_y = max_y + padding_y
 
-            min_x = max(0, stats.upper_bound - 2000)
+            min_x = max(0, stats.upper_bound - self.x_range)
             max_x = stats.upper_bound
             ax.set_xlim(min_x, max_x)
             ax.set_ylim(min_y, max_y)
@@ -104,3 +111,35 @@ class ScrollingPlot:
                 else:
                     self.plot_lines[stat] = ax.plot(stats.data[stat], color=plot.get("color", "b"))[0]
         self.fig.canvas.draw()
+
+
+class TestingStats:
+    def __init__(self):
+        self.avg_reward = 0.0
+
+
+def test_policy(env: Env, policy: Policy, episode_count=1000, random_seed=52346, max_steps=10000) -> float:
+    """
+    Return the average reward received after evaluating the policy episode_count times.
+
+    Preserves the state of the random number generator.
+    """
+    random_number_generator_state = np.random.get_state()
+    np.random.seed(random_seed)
+    total_reward = 0.0
+    try:
+        for i in range(episode_count):
+            obs = env.reset()
+            done = False
+            for step in range(max_steps):
+                action = policy.choose_action(obs)
+                obs, reward, done, _ = env.step(action)
+                total_reward += reward
+                if done:
+                    break
+            if not done:
+                raise Exception("Episode did not terminate")
+    finally:
+        np.random.set_state(random_number_generator_state)
+
+    return total_reward / episode_count

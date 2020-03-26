@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 from Environments.CleanBotEnv import CleanBotEnv
 from Models.TableModel import TableModel
-from Methods.MonteCarloMethods import AveragingMC
+from Methods.MonteCarloMethods import AveragingMC, ConstAlphaMC
 from Methods.Policies import EpsilonGreedyPolicy, GreedyPolicy
 
 SOUTH = CleanBotEnv.BotActions.SOUTH.value
@@ -74,6 +74,50 @@ class TestAveragingMonteCarlo(unittest.TestCase):
         episode_count = 100
         for i in range(episode_count):
             mc.run_episode()
+
+
+class TestConstAlphaMonteCarlo(unittest.TestCase):
+
+    def test_policy_update(self):
+        np.random.seed(643674)
+        initial_state = np.array([[0, 0, 0], [1, 0, 0], [0, 0, 0]], dtype=np.int)
+        initial_obs = np.array([[2, 0, 0], [1, 0, 0], [0, 0, 0]], dtype=np.int)
+        env = MockEnv(3)
+        model = TableModel(env)
+        greedy_policy = GreedyPolicy(model)
+
+        policy = MockPolicy([EAST, EAST, SOUTH, WEST, WEST, CLEAN])
+        mc = ConstAlphaMC(env, model, policy)
+        mc.alpha = 0.005
+        mc.run_episode()
+
+        self.assertEqual(mc.stats.episode_reward, 194)
+        self.assertAlmostEqual(mc.stats.max_action_value_delta, 0.97)
+        self.assertEqual(greedy_policy.choose_action(initial_obs), EAST)
+
+        policy = MockPolicy([EAST, EAST, SOUTH, WEST, WEST, CLEAN])
+        mc = ConstAlphaMC(env, model, policy)
+        mc.run_episode()
+
+        self.assertEqual(mc.stats.episode_reward, 194)
+        self.assertAlmostEqual(mc.stats.max_action_value_delta, 0.9651499998569488)
+        self.assertEqual(greedy_policy.choose_action(initial_obs), EAST)
+
+        mock_policy = MockPolicy([SOUTH, CLEAN])
+        mc.policy = mock_policy
+        mc.run_episode()
+
+        self.assertEqual(mc.stats.episode_reward, 198)
+        self.assertEqual(mc.stats.max_action_value_delta, 0.99)
+        self.assertEqual(greedy_policy.choose_action(initial_obs), EAST)
+
+        mock_policy = MockPolicy([SOUTH, CLEAN])
+        mc.policy = mock_policy
+        mc.run_episode()
+
+        self.assertEqual(mc.stats.episode_reward, 198)
+        self.assertEqual(mc.stats.max_action_value_delta, 0.9850499999523163)
+        self.assertEqual(greedy_policy.choose_action(initial_obs), SOUTH)
 
 
 if __name__ == "__main__":

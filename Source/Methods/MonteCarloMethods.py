@@ -11,7 +11,7 @@ from Models.Model import Model
 from Methods.Policies import EpsilonGreedyPolicy
 
 
-class Stats:
+class AveragingMcStats:
     def __init__(self):
         self.max_action_value_delta = None
         """
@@ -31,8 +31,8 @@ class Stats:
 
 class AveragingMC:
     """
-    A method in which each state-action value is determined by the average first-visit reward across all observed
-    episodes.
+    A monte carlo method in which each state-action value is determined by the average first-visit reward across all
+    observed episodes.
     """
 
     def __init__(self, env, model: Model, policy: EpsilonGreedyPolicy):
@@ -41,7 +41,7 @@ class AveragingMC:
         self.policy = policy
         self.total_returns = np.zeros(envutil.obs_action_shape(env), dtype=np.int32)
         self.visit_count = np.zeros(envutil.obs_action_shape(env), dtype=np.int32)
-        self.stats = Stats()
+        self.stats = AveragingMcStats()
 
     def run_episode(self):
         episode = envutil.record_episode(self.env, self.policy)
@@ -66,6 +66,46 @@ class AveragingMC:
 
             # Update the model
             self.model.update_action_value(obs_action, updated_action_value)
+        self.stats.episode_reward = total_reward
+        self.stats.max_action_value_delta = max_delta
+        return total_reward
+
+
+class ConstAlphaMCStats:
+    def __init__(self):
+        self.max_action_value_delta = None
+        """
+        Maximum delta of a state-action values in the last episode of state-action pairs that have been visited 
+        more than once
+        """
+
+        self.episode_reward = None
+        """Total reward of the last episode"""
+
+
+class ConstAlphaMC:
+    """
+    Monte carlo method using the update
+
+    model[observation, action] = alpha * (first_visit_reward - model[observation, action]])
+    """
+
+    def __init__(self, env, model: Model, policy: EpsilonGreedyPolicy):
+        self.env = env
+        self.model = model
+        self.policy = policy
+        self.alpha = 0.005
+        self.stats = ConstAlphaMCStats()
+
+    def run_episode(self):
+        episode = envutil.record_episode(self.env, self.policy)
+        episode_reward, total_reward = envutil.first_visit_rewards(self.env, episode)
+        max_delta = 0
+        for obs_action, reward in episode_reward.items():
+            current_action_value = self.model.action_values(obs_action)
+            action_value_delta = self.alpha * (reward - current_action_value)
+            max_delta = max(max_delta, action_value_delta)
+            self.model.update_action_value(obs_action, current_action_value + action_value_delta)
         self.stats.episode_reward = total_reward
         self.stats.max_action_value_delta = max_delta
         return total_reward
