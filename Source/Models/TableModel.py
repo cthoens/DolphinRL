@@ -1,5 +1,6 @@
 import numpy as np
 from Models.Model import Model
+from Utilities.Env import to_table_index
 
 from Utilities import Env
 
@@ -11,13 +12,16 @@ class TableModel(Model):
         self.shape = Env.obs_action_shape(env)
         self.value_function = np.zeros(self.shape, dtype=np.float32)
 
-    def action_values(self, observation):
-        """Get the action values for a given observation"""
-        return self.value_function[tuple(np.ravel(observation))]
+    def state_values(self, state):
+        return self.value_function[to_table_index(state)]
 
-    def update_action_value(self, obs_action, value):
+    def action_value(self, state, action):
+        """Get all action values for state."""
+        return self.value_function[to_table_index(state, action)]
+
+    def update_action_value(self, state, action, value):
         """Update a state-action value"""
-        self.value_function[tuple(np.ravel(obs_action))] = value
+        self.value_function[to_table_index(state, action)] = value
 
 
 

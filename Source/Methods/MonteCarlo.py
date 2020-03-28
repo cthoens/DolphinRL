@@ -6,6 +6,8 @@ Provides varieties of monte carlo methods.
 """
 
 import numpy as np
+from math import sqrt
+
 import Utilities.Env as envutil
 from Models.Model import Model
 from Methods.Policies import EpsilonGreedyPolicy
@@ -45,27 +47,30 @@ class AveragingMC:
 
     def run_episode(self):
         episode = envutil.record_episode(self.env, self.policy)
-        episode_reward, total_reward = envutil.first_visit_rewards(self.env, episode)
+        episode_reward, total_reward = envutil.first_visit_rewards(episode)
         max_delta = 0
-        for obs_action, reward in episode_reward.items():
+
+        for state_action, reward in episode_reward.items():
+            state, action = state_action
+            state_action_index = envutil.to_table_index(state, action)
             # Integrate new data
-            self.total_returns[obs_action] += reward
-            self.visit_count[obs_action] += 1
+            self.total_returns[state_action_index] += reward
+            self.visit_count[state_action_index] += 1
 
             # Calculate model update
-            visit_count = self.visit_count[obs_action]
-            updated_action_value = self.total_returns[obs_action] / visit_count
+            visit_count = self.visit_count[state_action_index]
+            updated_action_value = self.total_returns[state_action_index] / visit_count
 
             # Calculate stats
             if visit_count == 1:
                 self.stats.first_time_visited += 1
             else:
-                max_delta = max(max_delta, abs(self.model.action_values(obs_action) - updated_action_value))
+                max_delta = max(max_delta, abs(self.model.action_value(state, action) - updated_action_value))
             if visit_count == 5:
                 self.stats.fifth_time_visited += 1
 
             # Update the model
-            self.model.update_action_value(obs_action, updated_action_value)
+            self.model.update_action_value(state, action, updated_action_value)
         self.stats.episode_reward = total_reward
         self.stats.max_action_value_delta = max_delta
         return total_reward
@@ -81,6 +86,9 @@ class ConstAlphaMCStats:
 
         self.episode_reward = None
         """Total reward of the last episode"""
+
+        self.rms = None
+        """The root mean square error"""
 
 
 class ConstAlphaMC:
@@ -99,13 +107,17 @@ class ConstAlphaMC:
 
     def run_episode(self):
         episode = envutil.record_episode(self.env, self.policy)
-        episode_reward, total_reward = envutil.first_visit_rewards(self.env, episode)
+        episode_reward, total_reward = envutil.first_visit_rewards(episode)
         max_delta = 0
-        for obs_action, reward in episode_reward.items():
-            current_action_value = self.model.action_values(obs_action)
-            action_value_delta = self.alpha * (reward - current_action_value)
-            max_delta = max(max_delta, action_value_delta)
-            self.model.update_action_value(obs_action, current_action_value + action_value_delta)
+        squared_residuals = 0
+        for state_action, observed_reward in episode_reward.items():
+            state, action = state_action
+            predicted_reward = self.model.action_value(state, action)
+            action_value_delta = self.alpha * (observed_reward - predicted_reward)
+            squared_residuals += (observed_reward - predicted_reward)**2
+            max_delta = max(max_delta, abs(action_value_delta))
+            self.model.update_action_value(state, action, predicted_reward + action_value_delta)
         self.stats.episode_reward = total_reward
         self.stats.max_action_value_delta = max_delta
+        self.stats.rms = sqrt(squared_residuals / len(episode_reward))
         return total_reward

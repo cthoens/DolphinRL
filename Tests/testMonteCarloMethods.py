@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 from Environments.CleanBotEnv import CleanBotEnv
 from Models.TableModel import TableModel
-from Methods.MonteCarloMethods import AveragingMC, ConstAlphaMC
+from Methods.MonteCarlo import AveragingMC, ConstAlphaMC
 from Methods.Policies import EpsilonGreedyPolicy, GreedyPolicy
 
 SOUTH = CleanBotEnv.BotActions.SOUTH.value

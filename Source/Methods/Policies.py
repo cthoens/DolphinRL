@@ -29,8 +29,8 @@ class GreedyPolicy(Policy):
     def __init__(self, model: Model):
         self.model = model
 
-    def choose_action(self, observation):
-        action_values = self.model.action_values(observation)
+    def choose_action(self, state):
+        action_values = self.model.state_values(state)
         # If multiple actions have the same value, chose one at random
         maximums = np.argwhere(action_values == np.amax(action_values)).flatten()
         action = maximums[np.random.randint(0, len(maximums))]

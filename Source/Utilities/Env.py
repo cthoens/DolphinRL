@@ -46,7 +46,14 @@ def obs_action_shape(env):
     return np.append(np.ravel(obs_space.high)+1, [env.action_space.n])
 
 
-def first_visit_rewards(env: Env, episode: List[Interaction]) -> Tuple[Dict[tuple, float], float]:
+def to_table_index(obs, action=None):
+    if action is not None:
+        return tuple(np.ravel(obs)) + (action, )
+    else:
+        return tuple(np.ravel(obs))
+
+
+def first_visit_rewards(episode: List[Interaction]) -> Tuple[Dict[tuple, float], float]:
     """
     For each state-action pair visited in the episode return the total reward after the first visit
 
@@ -59,5 +66,5 @@ def first_visit_rewards(env: Env, episode: List[Interaction]) -> Tuple[Dict[tupl
     total_reward = 0
     for interaction in reversed(episode):
         total_reward += interaction.reward
-        rewards[tuple(interaction.obs) + (interaction.action, )] = total_reward
+        rewards[(tuple(interaction.obs), interaction.action)] = total_reward
     return rewards, total_reward
