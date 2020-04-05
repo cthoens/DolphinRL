@@ -1,5 +1,5 @@
 import numpy as np
-from Models.Model import Model
+from Model import Model
 from Utilities.Env import to_table_index
 
 from Utilities import Env
@@ -22,6 +22,9 @@ class TableModel(Model):
     def update_action_value(self, state, action, value):
         """Update a state-action value"""
         self.value_function[to_table_index(state, action)] = value
+
+    def save(self, file):
+        np.save(file, self.value_function, allow_pickle=False)
 
 
 

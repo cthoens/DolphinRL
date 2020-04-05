@@ -9,7 +9,7 @@ import numpy as np
 from math import sqrt
 
 import Utilities.Env as envutil
-from Models.Model import Model
+from Model import Model
 from Methods.Policies import EpsilonGreedyPolicy
 
 
@@ -47,11 +47,10 @@ class AveragingMC:
 
     def run_episode(self):
         episode = envutil.record_episode(self.env, self.policy)
-        episode_reward, total_reward = envutil.first_visit_rewards(episode)
+        first_visit_rewards, total_reward = envutil.first_visit_rewards(episode)
         max_delta = 0
 
-        for state_action, reward in episode_reward.items():
-            state, action = state_action
+        for state, action, reward in first_visit_rewards:
             state_action_index = envutil.to_table_index(state, action)
             # Integrate new data
             self.total_returns[state_action_index] += reward
@@ -107,11 +106,10 @@ class ConstAlphaMC:
 
     def run_episode(self):
         episode = envutil.record_episode(self.env, self.policy)
-        episode_reward, total_reward = envutil.first_visit_rewards(episode)
+        first_visit_rewards, total_reward = envutil.first_visit_rewards(episode)
         max_delta = 0
         squared_residuals = 0
-        for state_action, observed_reward in episode_reward.items():
-            state, action = state_action
+        for state, action, observed_reward in first_visit_rewards:
             predicted_reward = self.model.action_value(state, action)
             action_value_delta = self.alpha * (observed_reward - predicted_reward)
             squared_residuals += (observed_reward - predicted_reward)**2
@@ -119,5 +117,5 @@ class ConstAlphaMC:
             self.model.update_action_value(state, action, predicted_reward + action_value_delta)
         self.stats.episode_reward = total_reward
         self.stats.max_action_value_delta = max_delta
-        self.stats.rms = sqrt(squared_residuals / len(episode_reward))
+        self.stats.rms = sqrt(squared_residuals / len(first_visit_rewards))
         return total_reward

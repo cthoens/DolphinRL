@@ -6,7 +6,7 @@ Utility functions for dealing with environments
 """
 
 from gym import Env
-from typing import List, Tuple, Dict
+from typing import List, Tuple, Any, ValuesView
 from Methods.Policies import Policy
 import numpy as np
 
@@ -33,7 +33,7 @@ def record_episode(env: Env, policy: Policy, max_steps=10000) -> List[Interactio
     for i in range(max_steps):
         action = policy.choose_action(obs)
         next_obs, reward, done, _ = env.step(action)
-        episode.append(Interaction(np.ravel(obs), action, reward))
+        episode.append(Interaction(obs, action, reward))
         if done:
             return episode
         obs = next_obs
@@ -53,7 +53,7 @@ def to_table_index(obs, action=None):
         return tuple(np.ravel(obs))
 
 
-def first_visit_rewards(episode: List[Interaction]) -> Tuple[Dict[tuple, float], float]:
+def first_visit_rewards(episode: List[Interaction]) -> Tuple[ValuesView[Tuple[Any, Any, float]], float]:
     """
     For each state-action pair visited in the episode return the total reward after the first visit
 
@@ -63,8 +63,11 @@ def first_visit_rewards(episode: List[Interaction]) -> Tuple[Dict[tuple, float],
             total: The sum of reward of the episode
     """
     rewards = {}
-    total_reward = 0
+    total_reward = 0.0
     for interaction in reversed(episode):
-        total_reward += interaction.reward
-        rewards[(tuple(interaction.obs), interaction.action)] = total_reward
-    return rewards, total_reward
+        obs, action, reward = interaction.obs, interaction.action, interaction.reward
+        total_reward += reward
+        # Note: This is a hack used since observations are not hashable: to_table_index maps state to a
+        # unique tuple that is hashable
+        rewards[to_table_index(obs, action)] = (obs, action, total_reward)
+    return rewards.values(), total_reward

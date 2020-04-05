@@ -1,6 +1,4 @@
-
-import numpy as np
-from Models.Model import Model
+from Model import Model
 from Methods.Policies import EpsilonGreedyPolicy
 
 

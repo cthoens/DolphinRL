@@ -4,33 +4,12 @@ from Environments.CleanBotEnv import CleanBotEnv
 from Models.TableModel import TableModel
 from Methods.MonteCarlo import AveragingMC, ConstAlphaMC
 from Methods.Policies import EpsilonGreedyPolicy, GreedyPolicy
+from utilities import MockEnv, MockPolicy
 
 SOUTH = CleanBotEnv.BotActions.SOUTH.value
 EAST = CleanBotEnv.BotActions.EAST.value
 WEST = CleanBotEnv.BotActions.WEST.value
 CLEAN = CleanBotEnv.BotActions.CLEAN.value
-
-
-class MockPolicy(EpsilonGreedyPolicy):
-    def __init__(self, actions):
-        super().__init__(None, 0)
-        self.actions = actions
-        self.current = 0
-
-    def choose_action(self, observation):
-        action = self.actions[self.current]
-        self.current += 1
-        return action
-
-
-class MockEnv(CleanBotEnv):
-    def reset(self):
-        super().reset()
-        self.bot_x = 0
-        self.bot_y = 0
-        self.dirty_count = 1
-        self.state = np.array([[0, 0, 0], [1, 0, 0], [0, 0, 0]], dtype=np.int)
-        return self._get_obs()
 
 
 class TestAveragingMonteCarlo(unittest.TestCase):

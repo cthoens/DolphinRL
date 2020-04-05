@@ -80,11 +80,11 @@ class ScrollingPlot:
         else:
             self.axes = axes
         self.fig.show()
-        self.x_range = 2000
-        self.plot_lines = {}
+        self.x_range = 2001
+        self.plot_lines = [[None for _ in figure["plots"]] for figure in figures]
 
     def update_plot(self):
-        for figure, ax in zip(self.figures, self.axes):
+        for figure_idx, (figure, ax) in enumerate(zip(self.figures, self.axes)):
             stats = figure["source"]
             # min limits of y axis for all plots in this figure
             min_y = float("inf")
@@ -103,13 +103,13 @@ class ScrollingPlot:
             ax.set_ylim(min_y, max_y)
 
             # draw all plots in this figure
-            for plot in figure["plots"]:
+            for plot_idx, plot in enumerate(figure["plots"]):
                 stat = plot["stat"]
-                if stat in self.plot_lines:
-                    self.plot_lines[stat].set_xdata(np.arange(stats.lower_bound, stats.upper_bound + 1))
-                    self.plot_lines[stat].set_ydata(stats.data[stat])
+                if self.plot_lines[figure_idx][plot_idx]:
+                    self.plot_lines[figure_idx][plot_idx].set_xdata(np.arange(stats.lower_bound, stats.upper_bound + 1))
+                    self.plot_lines[figure_idx][plot_idx].set_ydata(stats.data[stat])
                 else:
-                    self.plot_lines[stat] = ax.plot(stats.data[stat], color=plot.get("color", "b"))[0]
+                    self.plot_lines[figure_idx][plot_idx] = ax.plot(stats.data[stat], color=plot.get("color", "b"))[0]
         self.fig.canvas.draw()
 
 

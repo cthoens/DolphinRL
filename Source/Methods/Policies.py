@@ -1,6 +1,6 @@
 import abc
 import numpy as np
-from Models import Model
+import Model
 
 
 class Policy:
