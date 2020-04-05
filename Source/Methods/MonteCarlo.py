@@ -10,7 +10,7 @@ from math import sqrt
 
 import Utilities.Env as envutil
 from Model import Model
-from Methods.Policies import EpsilonGreedyPolicy
+from Policies import EpsilonGreedyPolicy
 
 
 class AveragingMcStats:

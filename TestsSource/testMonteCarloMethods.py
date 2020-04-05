@@ -1,9 +1,9 @@
 import unittest
 import numpy as np
-from Environments.CleanBotEnv import CleanBotEnv
+from CleanBotEnv import CleanBotEnv
 from Models.TableModel import TableModel
 from Methods.MonteCarlo import AveragingMC, ConstAlphaMC
-from Methods.Policies import EpsilonGreedyPolicy, GreedyPolicy
+from Policies import EpsilonGreedyPolicy, GreedyPolicy
 from utilities import MockEnv, MockPolicy
 
 SOUTH = CleanBotEnv.BotActions.SOUTH.value

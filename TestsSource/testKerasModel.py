@@ -1,12 +1,11 @@
 import unittest
 import numpy as np
-from Environments.CleanBotEnv import CleanBotEnv
+from CleanBotEnv import CleanBotEnv
 from Models.KerasModel import KerasModel
 from Methods.MonteCarlo import ConstAlphaMC
-from Methods.Policies import EpsilonGreedyPolicy, GreedyPolicy
+from Policies import EpsilonGreedyPolicy
 from utilities import MockEnv
-from keras.losses import MSE
-from Experiments.KerasModelBuilders import conv1_model
+from KerasModelBuilders import conv1_model
 
 SOUTH = CleanBotEnv.BotActions.SOUTH.value
 EAST = CleanBotEnv.BotActions.EAST.value

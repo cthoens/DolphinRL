@@ -7,7 +7,7 @@ Utility functions for dealing with environments
 
 from gym import Env
 from typing import List, Tuple, Any, ValuesView
-from Methods.Policies import Policy
+from Policies import Policy
 import numpy as np
 
 

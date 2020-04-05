@@ -1,5 +1,5 @@
 import numpy as np
-from Environments.CleanBotEnv import CleanBotEnv
+from CleanBotEnv import CleanBotEnv
 import unittest
 
 

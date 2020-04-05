@@ -1,6 +1,6 @@
 import numpy as np
-from Environments.CleanBotEnv import CleanBotEnv
-from Methods.Policies import EpsilonGreedyPolicy, GreedyPolicy
+from CleanBotEnv import CleanBotEnv
+from Policies import EpsilonGreedyPolicy
 
 
 class MockPolicy(EpsilonGreedyPolicy):

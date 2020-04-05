@@ -7,14 +7,14 @@ methods and ways to represent the state-value-function
 """
 
 
-from Environments.CleanBotEnv import CleanBotEnv
+from CleanBotEnv import CleanBotEnv
 from Models.TableModel import TableModel
 from Models.KerasModel import KerasModel
 from Methods.MonteCarlo import ConstAlphaMC
 from Methods.TemporalDifference import Sarsa
-from Methods.Policies import EpsilonGreedyPolicy, GreedyPolicy
+from Policies import EpsilonGreedyPolicy, GreedyPolicy
 from Experiment import Experiment
-from Experiments.KerasModelBuilders import conv1_model
+from KerasModelBuilders import conv1_model
 
 
 class AlphaMCArrayModel(Experiment):
