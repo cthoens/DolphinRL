@@ -5,7 +5,7 @@ from Policies import EpsilonGreedyPolicy
 
 class MockPolicy(EpsilonGreedyPolicy):
     """
-    Policy that chooses a given stat sequence of actions
+    Policy that chooses a given static sequence of actions
     """
     def __init__(self, actions):
         super().__init__(None, 0)

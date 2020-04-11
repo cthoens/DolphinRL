@@ -2,7 +2,7 @@ from Model import Model
 from Policies import EpsilonGreedyPolicy
 
 
-class SarsaStats:
+class SarsaMetrics:
     def __init__(self):
         self.max_action_value_delta = None
         """
@@ -27,11 +27,11 @@ class Sarsa:
         self.policy = policy
         self.alpha = 0.005
         self.gamma = 0.9
-        self.stats = SarsaStats()
+        self.metrics = SarsaMetrics()
 
     def run_episode(self):
         state_0 = self.env.reset()
-        self.stats.episode_reward = 0
+        self.metrics.episode_reward = 0
 
         max_delta = 0
         for step in range(1000):
@@ -46,9 +46,9 @@ class Sarsa:
             state_0 = state_1
 
             max_delta = max(max_delta, abs(action_value_delta))
-            self.stats.episode_reward += reward
+            self.metrics.episode_reward += reward
             if done:
                 break
 
-        self.stats.max_action_value_delta = max_delta
-        return self.stats.episode_reward
+        self.metrics.max_action_value_delta = max_delta
+        return self.metrics.episode_reward

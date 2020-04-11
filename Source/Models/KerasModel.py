@@ -51,9 +51,8 @@ class KerasModel(Model):
         # Store observation and action value for model fitting
         self._x_train[self._collected_count] = state
         self._y_train[self._collected_count] = updated_state_values
-        if self._collected_count != self.batch_size-1:
-            self._collected_count += 1
-        else:
+        self._collected_count += 1
+        if self._collected_count == self.batch_size:
             # If batch_size updates have been collected fit the model and clear the buffer
             self.train()
             self._collected_count = 0
@@ -84,5 +83,7 @@ class KerasModel(Model):
     def action_value(self, state, action):
         return self.state_values(state)[action]
 
-    def save(self, file):
-        self.model.save(file)
+    def save(self, name):
+        if not name[:-3] == ".h5":
+            name = name+".h5"
+        self.model.save(name)

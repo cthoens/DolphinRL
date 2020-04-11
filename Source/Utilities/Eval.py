@@ -10,13 +10,13 @@ from gym import Env
 from Policies import Policy
 
 
-class StatsLogger:
+class MetricsLogger:
     """
     Logs performance statistics by collecting the values of all attributes of a given instance. Returns as numpy
     array that can be used efficiently with mathplotlib. Buffers have a maximum length. When this length is reached
     the oldest values get rotated out of the buffer when now values are added.
     """
-    def __init__(self, stats, max_length=100000):
+    def __init__(self, metrics, max_length=100000):
 
         self.count = 0
         """The number of elements in any array returned by data. Between 0 and max_length"""
@@ -35,28 +35,28 @@ class StatsLogger:
         self.upper_bound = -1
         """The index of the last element returned by data. One less than the number of times append was called."""
         self.max_length = max_length
-        self.data = {key: [] for key in stats.__dict__.keys()}
-        "Dict: each value in stat -> numpy array of values that have been collected"
-        self.max = {key: float("-inf") for key in stats.__dict__.keys()}
-        "Dict: each value in stat -> maximum value ever collected"
-        self.min = {key: float("inf") for key in stats.__dict__.keys()}
-        "Dict: each value in stat -> minimum value ever collected"
+        self.data = {key: [] for key in metrics.__dict__.keys()}
+        "Dict: each value in metrics -> numpy array of values that have been collected"
+        self.max = {key: float("-inf") for key in metrics.__dict__.keys()}
+        "Dict: each value in metrics -> maximum value ever collected"
+        self.min = {key: float("inf") for key in metrics.__dict__.keys()}
+        "Dict: each value in metrics -> minimum value ever collected"
 
         self._rollover_count = 0
         self._next_index = 0
         """Next index in data to write to"""
-        self._data = {key: np.zeros(2 * max_length) for key in stats.__dict__.keys()}
+        self._data = {key: np.zeros(2 * max_length) for key in metrics.__dict__.keys()}
 
-    def append(self, stats):
+    def append(self, metrics):
         if self._next_index == 2 * self.max_length:
             self._next_index = 0
             self._rollover_count += 1
-            for stat in self._data.values():
-                np.roll(stat, self.max_length)
+            for metric in self._data.values():
+                np.roll(metric, self.max_length)
 
         self.count = min(self.max_length, self.count + 1)
         self.upper_bound += 1
-        for key, value in stats.__dict__.items():
+        for key, value in metrics.__dict__.items():
             self.min[key] = min(self.min[key], value)
             self.max[key] = max(self.max[key], value)
             self._data[key][self._next_index] = value
@@ -66,12 +66,7 @@ class StatsLogger:
         self._next_index += 1
 
 
-class TestingStats:
-    def __init__(self):
-        self.avg_reward = 0.0
-
-
-def test_policy(env: Env, policy: Policy, episode_count=1000, random_seed=52346, max_steps=10000) -> float:
+def validate_policy(env: Env, policy: Policy, episode_count=1000, random_seed=52346, max_steps=10000) -> float:
     """
     Return the average reward received after evaluating the policy episode_count times.
 

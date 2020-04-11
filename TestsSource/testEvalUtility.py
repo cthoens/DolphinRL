@@ -2,30 +2,30 @@ import unittest
 import numpy as np
 from numpy.testing import assert_array_equal
 
-from Utilities.Eval import StatsLogger
+from Utilities.Eval import MetricsLogger
 
 
-class Stats:
+class Metrics:
     def __init__(self):
         self.cat_count = 0
         self.dog_count = 0
 
 
-class TestStatsCollector(unittest.TestCase):
+class TestMetricsCollector(unittest.TestCase):
 
     def test_sanity(self):
         """Perform simple sanity checks"""
-        stats = Stats()
-        collector = StatsLogger(stats)
+        metrics = Metrics()
+        collector = MetricsLogger(metrics)
 
         self.assertEqual(2, len(collector.data))
         self.assertEqual([], collector.data["cat_count"])
         self.assertEqual([], collector.data["dog_count"])
 
         # Add 5
-        stats.cat_count = 5
-        stats.dog_count = 7
-        collector.append(stats)
+        metrics.cat_count = 5
+        metrics.dog_count = 7
+        collector.append(metrics)
 
         self.assertEqual(2, len(collector.data))
         self.assertEqual([5], collector.data["cat_count"])
@@ -36,9 +36,9 @@ class TestStatsCollector(unittest.TestCase):
         self.assertEqual(7, collector.max["dog_count"])
 
         # Add 10
-        stats.cat_count = 10
-        stats.dog_count = 2
-        collector.append(stats)
+        metrics.cat_count = 10
+        metrics.dog_count = 2
+        collector.append(metrics)
 
         self.assertEqual(2, len(collector.data))
         assert_array_equal([5, 10], collector.data["cat_count"])
@@ -50,16 +50,16 @@ class TestStatsCollector(unittest.TestCase):
 
     def test_rollover(self):
         """Test that rollover works correctly when the maximum size of the buffer is reached"""
-        stats = Stats()
+        metrics = Metrics()
         max_length = 20
-        collector = StatsLogger(stats, max_length)
+        collector = MetricsLogger(metrics, max_length)
 
         # Fill collector to maximum length
         added_count = 0
         for i in range(max_length):
-            stats.cat_count = i
-            stats.dog_count = i + 100
-            collector.append(stats)
+            metrics.cat_count = i
+            metrics.dog_count = i + 100
+            collector.append(metrics)
 
             # Check invariants
             added_count += 1
@@ -71,9 +71,9 @@ class TestStatsCollector(unittest.TestCase):
 
         # Fill collector to maximum length one more time
         for i in range(max_length):
-            stats.cat_count = i + max_length
-            stats.dog_count = i + 100 + max_length
-            collector.append(stats)
+            metrics.cat_count = i + max_length
+            metrics.dog_count = i + 100 + max_length
+            collector.append(metrics)
 
             # Check invariants
             added_count += 1
@@ -86,9 +86,9 @@ class TestStatsCollector(unittest.TestCase):
 
         # Fill collector to maximum length a third time more time
         for i in range(max_length):
-            stats.cat_count = i + 2 * max_length
-            stats.dog_count = i + 100 + 2 * max_length
-            collector.append(stats)
+            metrics.cat_count = i + 2 * max_length
+            metrics.dog_count = i + 100 + 2 * max_length
+            collector.append(metrics)
 
             # Check invariants
             added_count += 1

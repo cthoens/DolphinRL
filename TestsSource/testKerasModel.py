@@ -2,7 +2,7 @@ import unittest
 import numpy as np
 from CleanBotEnv import CleanBotEnv
 from Models.KerasModel import KerasModel
-from Methods.MonteCarlo import ConstAlphaMC
+from Methods.MonteCarlo import AlphaMC
 from Policies import EpsilonGreedyPolicy
 from utilities import MockEnv
 from KerasModelBuilders import conv1_model
@@ -49,7 +49,7 @@ class TestKerasModel(unittest.TestCase):
         keras_model = conv1_model(env)
         model = KerasModel(env, model=keras_model, batch_size=7)
         policy = EpsilonGreedyPolicy(model, 0.1)
-        mc = ConstAlphaMC(env, model, policy)
+        mc = AlphaMC(env, model, policy)
 
         policy.exploration = 0.1
         episode_count = 1
