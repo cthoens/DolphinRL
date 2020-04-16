@@ -30,7 +30,7 @@ class KerasModel(Model):
         """The keras model"""
         self.batch_size = batch_size
         """The number of updates that are collected before the model is fitted to the new experience"""
-        self.epochs = 10
+        self.epochs = 60
         """The number of epochs to run when the model is fitted to the new experience"""
 
         self._collected_count = 0

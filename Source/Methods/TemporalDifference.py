@@ -21,12 +21,12 @@ class Sarsa:
     model[observation, action] = alpha * (first_visit_reward - model[observation, action]])
     """
 
-    def __init__(self, env, model: Model, policy: EpsilonGreedyPolicy):
+    def __init__(self, env, model: Model, policy: EpsilonGreedyPolicy, alpha=0.01, gamma=0.9):
         self.env = env
         self.model = model
         self.policy = policy
-        self.alpha = 0.005
-        self.gamma = 0.9
+        self.alpha = alpha
+        self.gamma = gamma
         self.metrics = SarsaMetrics()
 
     def run_episode(self):

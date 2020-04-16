@@ -28,7 +28,7 @@ class TestAveragingMonteCarlo(unittest.TestCase):
 
         self.assertEqual(mc.metrics.first_time_visited, 6)
         self.assertEqual(mc.metrics.fifth_time_visited, 0)
-        self.assertEqual(mc.metrics.episode_reward, 194)
+        self.assertEqual(mc.metrics.episode_reward, 12)
         self.assertEqual(mc.metrics.max_action_value_delta, 0)
         self.assertEqual(greedy_policy.choose_action(initial_obs), EAST)
 
@@ -38,7 +38,7 @@ class TestAveragingMonteCarlo(unittest.TestCase):
 
         self.assertEqual(mc.metrics.first_time_visited, 7)
         self.assertEqual(mc.metrics.fifth_time_visited, 0)
-        self.assertEqual(mc.metrics.episode_reward, 198)
+        self.assertEqual(mc.metrics.episode_reward, 16)
         self.assertEqual(mc.metrics.max_action_value_delta, 2.0)
         self.assertEqual(greedy_policy.choose_action(initial_obs), SOUTH)
 
@@ -70,32 +70,32 @@ class TestConstAlphaMonteCarlo(unittest.TestCase):
         mc.alpha = 0.005
         mc.run_episode()
 
-        self.assertEqual(mc.metrics.episode_reward, 194)
-        self.assertAlmostEqual(mc.metrics.max_action_value_delta, 0.97)
+        self.assertEqual(mc.metrics.episode_reward, 12)
+        self.assertAlmostEqual(mc.metrics.max_action_value_delta, 0.06)
         self.assertEqual(greedy_policy.choose_action(initial_obs), EAST)
 
         policy = MockPolicy([EAST, EAST, SOUTH, WEST, WEST, CLEAN])
         mc = AlphaMC(env, model, policy)
         mc.run_episode()
 
-        self.assertEqual(mc.metrics.episode_reward, 194)
-        self.assertAlmostEqual(mc.metrics.max_action_value_delta, 0.9651499998569488)
+        self.assertEqual(mc.metrics.episode_reward, 12)
+        self.assertAlmostEqual(mc.metrics.max_action_value_delta, 0.05970000000670552)
         self.assertEqual(greedy_policy.choose_action(initial_obs), EAST)
 
         mock_policy = MockPolicy([SOUTH, CLEAN])
         mc.policy = mock_policy
         mc.run_episode()
 
-        self.assertEqual(mc.metrics.episode_reward, 198)
-        self.assertEqual(mc.metrics.max_action_value_delta, 0.99)
+        self.assertEqual(mc.metrics.episode_reward, 16)
+        self.assertEqual(mc.metrics.max_action_value_delta, 0.08)
         self.assertEqual(greedy_policy.choose_action(initial_obs), EAST)
 
         mock_policy = MockPolicy([SOUTH, CLEAN])
         mc.policy = mock_policy
         mc.run_episode()
 
-        self.assertEqual(mc.metrics.episode_reward, 198)
-        self.assertEqual(mc.metrics.max_action_value_delta, 0.9850499999523163)
+        self.assertEqual(mc.metrics.episode_reward, 16)
+        self.assertEqual(mc.metrics.max_action_value_delta, 0.0796000000089407)
         self.assertEqual(greedy_policy.choose_action(initial_obs), SOUTH)
 
 

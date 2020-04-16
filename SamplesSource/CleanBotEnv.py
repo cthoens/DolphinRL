@@ -43,7 +43,7 @@ class CleanBotEnv(Env):
         self.width = width
         """The width of the grid"""
 
-        self.max_steps = 200
+        self.max_steps = width * width * 2
         """The maximum number of step before an episode terminates"""
 
         self.dirty_rate = dirty_rate

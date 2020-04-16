@@ -2,7 +2,7 @@
 MonteCarloMethods
 =================
 
-Provides varieties of monte carlo methods.
+Provides variations of monte carlo methods.
 """
 
 import numpy as np

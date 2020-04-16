@@ -27,7 +27,7 @@ class TestCleanBotEnv(unittest.TestCase):
         response = env.step(CleanBotEnv.BotActions.SOUTH.value)
         check_state((1, 2), dirty=True)
         response = env.step(CleanBotEnv.BotActions.CLEAN.value)
-        check_state((1, 2), reward=196)
+        check_state((1, 2), reward=46)
 
         response = env.step(CleanBotEnv.BotActions.EAST.value)
         check_state((1, 3))
@@ -36,7 +36,7 @@ class TestCleanBotEnv(unittest.TestCase):
         response = env.step(CleanBotEnv.BotActions.SOUTH.value)
         check_state((2, 4), dirty=True)
         response = env.step(CleanBotEnv.BotActions.CLEAN.value)
-        check_state((2, 4), reward=192, done=True)
+        check_state((2, 4), reward=42, done=True)
 
 
 if __name__ == '__main__':
