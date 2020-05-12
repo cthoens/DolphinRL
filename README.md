@@ -1,6 +1,6 @@
 # Dophin RL
 
-Dolphin RL is a reinforcement learning library that is built around a pluggable architecture that facilitates experimentation with RL methods and models of the state-value function. It come with an experimentation framework that ensures the experiments are reproducible, and persistent.
+Dolphin RL is a reinforcement learning library that is built around a pluggable architecture that facilitates experimentation with RL methods and models of the state-value function. It comes with an experimentation framework that ensures the experiments are reproducible, and persistent.
 
 For an in-depth introduction to RL please refer to [Reinforcement Learning - An Introduction](https://mitpress.mit.edu/books/reinforcement-learning-second-edition) by Richard S. Sutton and Andrew G. Barto.
 
