@@ -23,6 +23,8 @@ class KerasModel(Model):
         assert isinstance(env.observation_space, spaces.Box), "Unsupported observation space"
         assert np.count_nonzero(env.observation_space.low) == 0, "Unsupported observation space"
         assert isinstance(env.action_space, spaces.Discrete), "Unsupported action space"
+        assert model.input_shape[1:] == env.observation_space.shape, f"model input shape {model.input_shape} does not batch " \
+                                                                 f"observation space shape {env.observation_space.shape}"
 
         self.env = env
         """The environment"""
@@ -34,7 +36,7 @@ class KerasModel(Model):
         """The number of epochs to run when the model is fitted to the new experience"""
 
         self._collected_count = 0
-        self._rows_count, self._col_count = env.observation_space.shape
+        self._rows_count, self._col_count, self._channels = env.observation_space.shape
         self._x_train_shape = (self.batch_size,) + env.observation_space.shape
         self._x_train = np.zeros(self._x_train_shape, 'float32')
         """observations used as input during model fitting"""
@@ -63,9 +65,10 @@ class KerasModel(Model):
 
         # Reshape to match the image format of the backend used
         if K.image_data_format() == 'channels_first':
-            x_train = self._x_train.reshape((self._x_train.shape[0], 1, self._rows_count, self._col_count,))
+            # x_train = self._x_train.reshape((self._x_train.shape[0], 1, self._rows_count, self._col_count,))
+            raise NotImplementedError
         else:
-            x_train = self._x_train.reshape((self._x_train.shape[0], self._rows_count, self._col_count, 1,))
+            x_train = self._x_train.reshape((self._x_train.shape[0], self._rows_count, self._col_count, self._channels,))
 
         self.model.fit(x_train, self._y_train,
                        batch_size=self.batch_size,
@@ -76,7 +79,7 @@ class KerasModel(Model):
         # Normalize the input values.
         normalized_state = state * self._input_normalizer
         # Add batch size of 1 to front, and 1 channel to back of the state shape
-        shape = (1, ) + state.shape + (1, )
+        shape = (1, ) + state.shape  # + (1, )
         # Predict and extract prediction for batch 0
         return self.model.predict(normalized_state.reshape(shape))[0]
 

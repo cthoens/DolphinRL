@@ -48,7 +48,7 @@ class EpsilonGreedyPolicy(GreedyPolicy):
 
     def choose_action(self, observation):
         if np.random.random_sample() < self.exploration:
-            action = np.random.randint(0, self.model.env.action_space.n)
+            action = np.int64(np.random.randint(0, self.model.env.action_space.n))
             return action
         else:
             return super().choose_action(observation)

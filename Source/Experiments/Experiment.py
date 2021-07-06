@@ -21,8 +21,8 @@ class Experiment:
         self.method = method
         self.name = type(self).__name__
 
-    def validate(self, episode_count=200):
-        return validate_policy(self.env, self.testing_policy, episode_count=episode_count)
+    async def validate(self, episode_count=200):
+        return await validate_policy(self.env, self.testing_policy, episode_count=episode_count)
 
 
 class Suite:
@@ -37,8 +37,8 @@ class Suite:
         self.validation_episode_count = validation_episode_count
         """Number of episodes in the validation set"""
 
-    def validate(self, experiment: Experiment):
-        return experiment.validate(episode_count=self.validation_episode_count)
+    async def validate(self, experiment: Experiment):
+        return await experiment.validate(episode_count=self.validation_episode_count)
 
 
 class DefaultSuite(Suite):

@@ -14,16 +14,17 @@ from Utilities.Eval import MetricsLogger
 from console_progressbar import ProgressBar
 import sys
 import importlib
+import asyncio
 from Experiments.Experiment import Experiment, Suite
 
 
-def run_experiment_module(suite_module_name):
+async def run_experiment_module(suite_module_name):
     module = importlib.import_module(suite_module_name)
     suite: Suite = module.experiment_suite()
-    run_experiment_suite(suite)
+    await run_experiment_suite(suite)
 
 
-def run_experiment_suite(suite):
+async def run_experiment_suite(suite):
     class ValidationMetrics:
         def __init__(self):
             self.training_avg_reward = 0.0
@@ -44,7 +45,7 @@ def run_experiment_suite(suite):
             pb = ProgressBar(total=suite.episode_count, prefix=f"{experiment.name}", length=50, fill='X')
             pb.print_progress_bar(0)
             for i in range(suite.episode_count):
-                reward = experiment.method.run_episode()
+                reward = await experiment.method.run_episode()
                 pb.print_progress_bar(i)
                 # print(f" - {reward:.2f}", end="")
                 training_metrics_log.append(experiment.method.metrics)
@@ -53,7 +54,7 @@ def run_experiment_suite(suite):
                 if i % suite.validation_frequency == suite.validation_frequency - 1:
                     validation_metrics.training_avg_reward = np.average(
                         training_metrics_log.data["episode_reward"][-suite.validation_frequency:])
-                    validation_metrics.validation_avg_reward = suite.validate(experiment)
+                    validation_metrics.validation_avg_reward = await suite.validate(experiment)
                     validation_metrics_log.append(validation_metrics)
 
             print(f"\r{experiment.name}: {validation_metrics.validation_avg_reward:>10.3f}")
@@ -71,4 +72,5 @@ if __name__ == '__main__':
     if len(args) == 0:
         raise SystemExit(f"Usage: {sys.argv[0]} <experiments module>")
 
-    run_experiment_module(args[0])
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(run_experiment_module(args[0]))

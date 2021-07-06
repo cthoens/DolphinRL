@@ -45,8 +45,8 @@ class AveragingMC:
         self.visit_count = np.zeros(envutil.obs_action_shape(env), dtype=np.int32)
         self.metrics = AveragingMcMetrics()
 
-    def run_episode(self):
-        episode = envutil.record_episode(self.env, self.policy)
+    async def run_episode(self):
+        episode = await envutil.record_episode(self.env, self.policy)
         first_visit_rewards, total_reward = envutil.first_visit_rewards(episode)
         max_delta = 0
 
@@ -104,8 +104,8 @@ class AlphaMC:
         self.alpha = 0.005
         self.metrics = AlphaMCMetrics()
 
-    def run_episode(self):
-        episode = envutil.record_episode(self.env, self.policy)
+    async def run_episode(self):
+        episode = await envutil.record_episode(self.env, self.policy)
         first_visit_rewards, total_reward = envutil.first_visit_rewards(episode)
         max_delta = 0
         squared_residuals = 0

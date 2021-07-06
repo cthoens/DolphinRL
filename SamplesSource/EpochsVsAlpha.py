@@ -13,23 +13,24 @@ from Methods.MonteCarlo import AlphaMC
 from Policies import EpsilonGreedyPolicy, GreedyPolicy
 from Experiments.Experiment import Experiment, Suite, DefaultSuite
 from KerasModelBuilders import conv1_model
+from aiogym import AsyncEnvWrapper
 
 
 class EpochsVsAlpha(Experiment):
     def __init__(self, epochs, alpha, batch_size):
         super().__init__()
-        self.env = CleanBotEnv(4)
+        self.env = AsyncEnvWrapper(CleanBotEnv(4))
         self.model = KerasModel(self.env, model=conv1_model(self.env), batch_size=batch_size)
         self.training_policy = EpsilonGreedyPolicy(self.model, 0.1)
         self.testing_policy = GreedyPolicy(self.model)
         self.method = AlphaMC(self.env, self.model, self.training_policy)
-        self.name = f"{type(self).__name__}-{self.batch_size:03}-{self.model.epochs:03}-{self.method.alpha:.2f}"
 
         self.training_policy.exploration = 0.1
         self.env.max_steps = 32
         self.method.alpha = alpha
         self.model.epochs = epochs
         self.batch_size = batch_size
+        self.name = f"{type(self).__name__}-{self.batch_size:03}-{self.model.epochs:03}-{self.method.alpha:.2f}"
 
 
 def experiment_suite() -> Suite:
@@ -46,7 +47,7 @@ def experiment_suite() -> Suite:
     return DefaultSuite(
         EpochsVsAlpha,
         experiments,
-        episode_count=5000,
-        validation_frequency=250,
-        validation_episode_count=50
+        episode_count=100,
+        validation_frequency=25,
+        validation_episode_count=10
     )

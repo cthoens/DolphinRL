@@ -66,7 +66,7 @@ class MetricsLogger:
         self._next_index += 1
 
 
-def validate_policy(env: Env, policy: Policy, episode_count=1000, random_seed=52346, max_steps=10000) -> float:
+async def validate_policy(env: Env, policy: Policy, episode_count=1000, random_seed=52346, max_steps=10000) -> float:
     """
     Return the average reward received after evaluating the policy episode_count times.
 
@@ -77,11 +77,11 @@ def validate_policy(env: Env, policy: Policy, episode_count=1000, random_seed=52
     total_reward = 0.0
     try:
         for i in range(episode_count):
-            obs = env.reset()
+            obs = await env.reset()
             done = False
             for step in range(max_steps):
                 action = policy.choose_action(obs)
-                obs, reward, done, _ = env.step(action)
+                obs, reward, done, _ = await env.step(action)
                 total_reward += reward
                 if done:
                     break

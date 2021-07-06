@@ -15,6 +15,7 @@ from Methods.TemporalDifference import Sarsa
 from Policies import EpsilonGreedyPolicy, GreedyPolicy
 from Experiments.Experiment import Experiment, Suite
 from KerasModelBuilders import conv1_model
+from aiogym import AsyncEnvWrapper
 
 
 class AlphaMCArrayModel(Experiment):
@@ -24,7 +25,7 @@ class AlphaMCArrayModel(Experiment):
     """
     def __init__(self):
         super().__init__()
-        self.env = CleanBotEnv(4)
+        self.env = AsyncEnvWrapper(CleanBotEnv(4))
         self.model = TableModel(self.env)
         self.training_policy = EpsilonGreedyPolicy(self.model, 0.1)
         self.testing_policy = GreedyPolicy(self.model)
@@ -42,7 +43,7 @@ class AlphaMcConv1KerasModel(Experiment):
     """
     def __init__(self):
         super().__init__()
-        self.env = CleanBotEnv(4)
+        self.env = AsyncEnvWrapper(CleanBotEnv(4))
         self.model = KerasModel(self.env, model=conv1_model(self.env), batch_size=64)
         self.training_policy = EpsilonGreedyPolicy(self.model, 0.1)
         self.testing_policy = GreedyPolicy(self.model)
@@ -61,7 +62,7 @@ class SarsaArrayModel(Experiment):
     """
     def __init__(self):
         super().__init__()
-        self.env = CleanBotEnv(4)
+        self.env = AsyncEnvWrapper(CleanBotEnv(4))
         self.model = TableModel(self.env)
         self.training_policy = EpsilonGreedyPolicy(self.model, 0.1)
         self.testing_policy = GreedyPolicy(self.model)
@@ -79,7 +80,7 @@ class SarsaConv1KerasModel(Experiment):
     """
     def __init__(self):
         super().__init__()
-        self.env = CleanBotEnv(4)
+        self.env = AsyncEnvWrapper(CleanBotEnv(4))
         self.model = KerasModel(self.env, model=conv1_model(self.env), batch_size=64)
         self.training_policy = EpsilonGreedyPolicy(self.model, 0.1)
         self.testing_policy = GreedyPolicy(self.model)
@@ -93,10 +94,7 @@ class SarsaConv1KerasModel(Experiment):
 
 class TableVsDeepModelSuite(Suite):
     def __init__(self):
-        super().__init__()
-        self.validation_frequency = 1000
-        self.episode_count = 50000
-        self.validation_episode_count = 50
+        super().__init__(episode_count=100, validation_frequency=20, validation_episode_count=20)
         self.experiments = [AlphaMCArrayModel, AlphaMcConv1KerasModel, SarsaArrayModel, SarsaConv1KerasModel]
 
 

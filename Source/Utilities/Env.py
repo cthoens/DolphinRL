@@ -19,7 +19,7 @@ class Interaction:
         self.reward = ret
 
 
-def record_episode(env: Env, policy: Policy, max_steps=10000) -> List[Interaction]:
+async def record_episode(env: Env, policy: Policy, max_steps=10000) -> List[Interaction]:
     """
     Record a sequence of interactions with the environment until the episode terminates or a maximum number of
     steps is reached.
@@ -28,11 +28,11 @@ def record_episode(env: Env, policy: Policy, max_steps=10000) -> List[Interactio
         The sequence of interactions as a List[:class Interaction:].
     """
     episode = []
-    obs = env.reset()
+    obs = await env.reset()
 
     for i in range(max_steps):
         action = policy.choose_action(obs)
-        next_obs, reward, done, _ = env.step(action)
+        next_obs, reward, done, _ = await env.step(action)
         episode.append(Interaction(obs, action, reward))
         if done:
             return episode

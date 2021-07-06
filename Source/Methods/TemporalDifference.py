@@ -29,14 +29,14 @@ class Sarsa:
         self.gamma = gamma
         self.metrics = SarsaMetrics()
 
-    def run_episode(self):
-        state_0 = self.env.reset()
+    async def run_episode(self):
+        state_0 = await self.env.reset()
         self.metrics.episode_reward = 0
 
         max_delta = 0
         for step in range(1000):
             action_0 = self.policy.choose_action(state_0)
-            state_1, reward, done, _ = self.env.step(action_0)
+            state_1, reward, done, _ = await self.env.step(action_0)
             action_1 = self.policy.choose_action(state_1)
 
             state_action_0_value = self.model.action_value(state_0, action_0)

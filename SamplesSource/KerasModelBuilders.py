@@ -15,17 +15,17 @@ def conv1_model(env: Env) -> keras.Model:
     :param env: The environment to build the model for
     :return: The compiled Keras model
     """
-    if K.image_data_format() == 'channels_first':
-        input_shape = (1, ) + env.observation_space.shape
-    else:
-        input_shape = env.observation_space.shape + (1, )
+    #if K.image_data_format() == 'channels_first':
+    input_shape = (1, ) + env.observation_space.shape
+    #else:
+    #    input_shape = env.observation_space.shape + (1, )
 
     model = Sequential()
-    model.add(Conv2D(32, kernel_size=(3, 3),
+    model.add(Conv2D(32, kernel_size=(64, 64),
                      activation='relu',
                      input_shape=input_shape))
     model.add(Flatten())
-    model.add(Dense(128, activation='relu'))
+    model.add(Dense(16, activation='relu'))
     model.add(Dense(env.action_space.n, activation='linear'))
 
     model.compile(loss=keras.losses.mse,
@@ -46,17 +46,17 @@ def conv2_model(env: Env) -> keras.Model:
     :param env: The environment to build the model for
     :return: The compiled Keras model
     """
-    if K.image_data_format() == 'channels_first':
-        input_shape = (1, ) + env.observation_space.shape
-    else:
-        input_shape = env.observation_space.shape + (1, )
+    # if K.image_data_format() == 'channels_first':
+    #input_shape = (1, ) + env.observation_space.shape
+    # else:
+    #    input_shape = env.observation_space.shape + (1, )
 
     model = Sequential()
-    model.add(Conv2D(32, kernel_size=(3, 3),
+    model.add(Conv2D(32, kernel_size=(64, 64),
                      activation='relu',
-                     input_shape=input_shape))
-    model.add(Conv2D(64, (3, 3), activation='relu'))
-    model.add(MaxPooling2D(pool_size=(2, 2)))
+                     input_shape=env.observation_space.shape))
+    model.add(Conv2D(32, (32, 32), activation='relu'))
+    #model.add(MaxPooling2D(pool_size=(2, 2)))
     model.add(Dropout(0.25))
     model.add(Flatten())
     model.add(Dense(128, activation='relu'))
